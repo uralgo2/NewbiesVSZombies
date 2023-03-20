@@ -8,11 +8,35 @@
         margin: 0;
       }
     </style>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://yandex.ru/games/sdk/v2"></script>
     <script type="module" src="/src/index.ts"></script>
+    <script type="module" src="/src/init.js"></script>
+    <style>
+      @font-face {
+        font-family: 'monogram';
+        src: url('assets/fonts/monogram-extended.ttf')  format('truetype');
+      }
+    </style>
   </head>
   <body>
-    <div id="game"></div>
-    <script>
-    </script>
+    <div id="game">
+      <div class="ui hidden">
+        <p id="money_text_container">Монет: <span id="money_text">0</span></p>
+        <p id="not_enough_money_text" class="hidden">Не достаточно монет!</p>
+      </div>
+      <div class="menu">
+        <p class="title">Нубики Против Зомби</p>
+
+        <button class="start btn">Играть</button>
+        <button class="settings btn">Настройки</button>
+      </div>
+      <div class="lose menu hidden">
+        <p class="title">Нубики Против Зомби</p>
+
+        <button class="re start btn">Начать заново</button>
+        <button class="settings btn">Настройки</button>
+      </div>
+    </div>
   </body>
 </html>

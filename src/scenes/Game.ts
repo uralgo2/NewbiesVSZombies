@@ -1,10 +1,16 @@
-import Phaser from 'phaser';
+import Phaser, {Game} from 'phaser';
 import {Defender} from "../Defender";
 import {Carbine} from "../weapons/Carbine";
 import {Enemy} from "../Enemy";
+import {GameState} from "../GameState";
 
 const MAX_NEWBIE_ZOMBIE_HP = 32
-export default class Demo extends Phaser.Scene {
+
+export function between (num: number, x: number, y: number) {
+  return Math.min(y, Math.max(x, num))
+}
+
+export default class Main extends Phaser.Scene {
   private isFire = false
   private zombieHP = MAX_NEWBIE_ZOMBIE_HP
   private shootSound: Phaser.Sound.BaseSound | undefined
@@ -15,8 +21,10 @@ export default class Demo extends Phaser.Scene {
 
   preload() {
     this.load.aseprite('newbie', 'assets/newbie.png', 'assets/newbie.json')
-    this.load.aseprite('zombie-newbie', 'assets/zombie-newbie.png', 'assets/zombie-newbie.json')
+    this.load.aseprite('zombie-newbie', 'assets/zombie-newbie3.png', 'assets/zombie-newbie3.json')
     this.load.aseprite('gun_0', 'assets/gun_0.png', 'assets/gun_0.json')
+
+    this.load.image('background', 'assets/background.png');
 
     this.load.audio('gun-gunshot-01', 'assets/sounds/gun-gunshot-01.mp3')
     this.load.audio('gun-gunshot-02', 'assets/sounds/gun-gunshot-02.mp3')
@@ -38,50 +46,70 @@ export default class Demo extends Phaser.Scene {
     this.anims.createFromAseprite('newbie')
     this.anims.createFromAseprite('gun_0')
 
-    const enemy = new Enemy(this, 600, 48, 'zombie-newbie')
-    const defender = new Defender(this, 16, 48, 'newbie', new Carbine(this, 0, 0))
+    const defender = new Defender(this, 16, 98, 'newbie', new Carbine(this, 0, 0))
 
     this.shootSound = this.sound.add('gun-gunshot-01', {
       loop: false,
     })
     defender.Shoot()
-
+    defender.setInteractive()
     defender.setScale(5)
-    enemy.setScale(5)
 
-    this.enemies.add(enemy)
-  }
+    this.input.keyboard.on('keydown', (e: KeyboardEvent) => {
+      if(e.key !== ' ') return
+      if(GameState.instance.Money < 20) {
+        GameState.instance.NotEnoughMoney()
+        return
+      }
+      GameState.instance.Money -= 20
 
+      const defender = new Defender(
+          this,
+          between(this.input.activePointer.x-16*5, 0, 300),
+          between(this.input.activePointer.y-16*5, 98, 550),
+          'newbie',
+          new Carbine(this, 0, 0)
+      )
+      defender.WaitForEnemies()
 
-  private fire(newbie: Phaser.GameObjects.Sprite, gun: Phaser.GameObjects.Sprite){
-    this.isFire = true
-
-    newbie.anims.play('Fire')
-
-    gun.setPosition(28, 20)
-    gun.once('animationcomplete', (animation: Phaser.Animations.Animation, frame: Phaser.Animations.AnimationFrame, go: Phaser.GameObjects.GameObject) => {
-      newbie.anims.play({
-        key: 'Idle',
-        repeat: -1,
-        frameRate: 4,
-      })
-      gun.anims.play('Gun_0_Idle')
-      this.isFire = false
-
-      gun.setPosition(24, 28)
+      defender.setScale(5)
     })
-    gun.anims.play('Gun_0_Fire')
-    this.shootSound!.play()
 
+    const background = this.add.image(0, 200, 'background')
 
+    background.depth = 0
+
+    background.setOrigin(0)
+    background.setScale(10)
+
+  let difficult = 5000;
+    const spawn = () => {
+      if(document.hasFocus()) {
+        difficult *= 0.95
+        difficult = between(difficult, 800, 5000)
+
+        const enemy = new Enemy(this, 1280, between(Math.random() * 720 - 16 * 5, 98, 550), 'zombie-newbie')
+        enemy.setScale(5)
+      }
+      setTimeout(spawn, difficult)
+    }
+
+    spawn()
+    this.resize()
+    this.scale.on('resize', () => {
+      this.resize();
+
+    });
   }
 
-  private redrawHealthBar(bar: Phaser.GameObjects.Graphics) {
-    bar.fillStyle(0xCCCCCC)
-    bar.fillRect(48, 8, 32, 4)
+  private resize() {
+    const canvas = document.querySelector('#game canvas') as HTMLCanvasElement
+    const offsetLeft = canvas.style.marginLeft
+    const offsetTop = canvas.style.marginTop
 
-    bar.fillStyle(0xFF0000)
-    bar.fillRect(48, 8, (this.zombieHP/MAX_NEWBIE_ZOMBIE_HP)*32, 4)
+    const ui = document.querySelector('.ui') as HTMLElement
 
+    ui.style.paddingLeft = offsetLeft
+    ui.style.paddingTop = offsetTop
   }
 }

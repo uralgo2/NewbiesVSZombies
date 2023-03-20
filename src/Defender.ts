@@ -1,29 +1,34 @@
 import {Weapon} from "./Weapon";
 import Phaser from "phaser";
-import Demo from "./scenes/Game";
+import Main, {between} from "./scenes/Game";
+import {GameState} from "./GameState";
+import {Enemy} from "./Enemy";
 
 export class Defender extends Phaser.GameObjects.Container {
-    protected sprite: Phaser.GameObjects.Sprite
+    sprite: Phaser.GameObjects.Sprite
     protected weapon: Weapon
-    protected healthPoints: number = 15
+    protected healthPoints: number = 20
     protected maxHealthPoints: number = 20
-    protected bar: Phaser.GameObjects.Graphics
+    bar: Phaser.GameObjects.Graphics
+    public TimeToDetectEnemy: number = 1000
+    private gameState = GameState.instance
+    public isDead: boolean = false
     constructor(
         scene: Phaser.Scene,
         x: number,
         y: number,
         texture: string,
-        weapon: Weapon
+        weapon: Weapon,
     ) {
         super(scene, x, y)
 
-        this.sprite = scene.add.sprite(0, 0, texture)
+        this.sprite = scene.physics.add.sprite(0, 0, texture)
             .setOrigin(0)
             .setScale(2)
         this.weapon = weapon
         weapon.x = 8
         weapon.y = 12
-
+        weapon.play('Gun_0_Idle')
         this.x = x
         this.y = y
         this.bar = scene.add.graphics()
@@ -37,30 +42,68 @@ export class Defender extends Phaser.GameObjects.Container {
         scene.add.existing(this)
         this.add([this.sprite, weapon, this.bar])
 
-
         this.redrawHealthBar()
         this.sprite.anims.play('Idle')
+
+        this.gameState.defenders.add(this)
+        this.depth = this.y
+        this.sprite.setInteractive({draggable: true})
+        scene.input.setDraggable(this.sprite)
+        this.sprite.on('drag',  (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number)=> {
+
+            this.x = between(pointer.x - 16 * 5, 0, 300);
+            this.depth = this.y = between(pointer.y - 16 * 5, 98, 550);
+
+        });
     }
 
+    public Idle(){
+        this.sprite.anims.play({
+            key: 'Idle',
+            repeat: -1,
+            frameRate: 4,
+        })
+
+        this.weapon.setPosition(8, 12)
+    }
 
     public Shoot(){
+        if(this.isDead) return
         if(this.weapon.AmmoCount === 0)
             return this.Reload()
+
+        let has = false
+
+        const halfHeight = this.sprite.displayHeight*this.scale / 2
+        for(let enemy of this.gameState.enemies){
+            if(enemy.y >= this.y - halfHeight  && enemy.y <= this.y + halfHeight
+            && enemy.x < this.scene.game.scale.width - enemy.sprite.displayHeight*enemy.scale /2) {
+                has = true
+                break
+            }
+        }
+
+        if(!has) return this.WaitForEnemies(true)
 
         this.weapon.AmmoCount -= 1
 
         const intersect = Phaser.Geom.Intersects.LineToRectangle
         const line = new Phaser.Geom.Line(this.x+12*this.scale, this.y+12*this.scale, 1280, this.y+12*this.scale)
 
-        for (const enemy of (this.scene as Demo).enemies) {
-            const rect = new Phaser.Geom.Rectangle(enemy.x, enemy.y, 2, enemy.sprite.displayHeight*this.scale)
+        const enemisToShoot = []
+        for (const enemy of this.gameState.enemies) {
+            const rect = new Phaser.Geom.Rectangle(enemy.x, enemy.y, 2, enemy.sprite.displayHeight*enemy.scale)
             const isIntersects = intersect(line, rect)
             if(isIntersects)
             {
-                enemy.Damage(this.weapon.Damage)
-                break
+                enemisToShoot.push(enemy.sprite)
             }
         }
+
+        const closest = this.scene.physics.closest(this.sprite, enemisToShoot) as Phaser.GameObjects.Sprite
+
+        if(closest?.parentContainer)
+            (closest?.parentContainer as Enemy).Damage(this.weapon.Damage)
 
         this.sprite.anims.play({
             key: 'Fire',
@@ -70,15 +113,7 @@ export class Defender extends Phaser.GameObjects.Container {
         this.weapon.once('animationcomplete', (animation: Phaser.Animations.Animation, frame: Phaser.Animations.AnimationFrame, go: Phaser.GameObjects.GameObject) => {
             this.weapon.anims.play('Gun_0_Idle')
 
-            if(!this.weapon.AmmoCount) {
-                this.sprite.anims.play({
-                    key: 'Idle',
-                    repeat: -1,
-                    frameRate: 4,
-                })
-
-                this.weapon.setPosition(8, 12)
-            }
+            if(!this.weapon.AmmoCount) this.Idle()
 
             setTimeout(() => this.Shoot(), this.weapon.ShootDelay)
         })
@@ -92,6 +127,11 @@ export class Defender extends Phaser.GameObjects.Container {
     public Damage(delta: number){
         this.healthPoints -= delta
         this.redrawHealthBar()
+        console.log(this.healthPoints)
+        if(this.healthPoints <= 0)
+        {
+            this.Die()
+        }
     }
     public Reload(){
         this.weapon.ReloadSound.play()
@@ -102,14 +142,35 @@ export class Defender extends Phaser.GameObjects.Container {
     private redrawHealthBar() {
         this.bar.clear()
 
-        this.bar.fillStyle(0xCCCCCC, 0.5)
-        this.bar.fillRect(0, -8, 32, 4)
+        if(this.healthPoints != this.maxHealthPoints) {
+            this.bar.fillStyle(0xCCCCCC, 0.5)
+            this.bar.fillRect(0, -8, 32, 4)
 
-        this.bar.fillStyle(0x00FF00, 0.7)
-        this.bar.fillRect(0, -8, (this.healthPoints/this.maxHealthPoints)*32, 4)
+            this.bar.fillStyle(0x00FF00, 0.7)
+            this.bar.fillRect(0, -8, (this.healthPoints / this.maxHealthPoints) * 32, 4)
+        }
     }
 
 
     preUpdate(time: number, delta: number) {
+    }
+
+    public WaitForEnemies(force: boolean = false) {
+        if(force || !GameState.instance.enemies.size) {
+            this.Idle()
+            return setTimeout(() => this.WaitForEnemies(), this.TimeToDetectEnemy)
+        }
+
+        this.Shoot()
+    }
+
+    private Die() {
+        this.isDead = true
+        this.destroy(true)
+        this.gameState.defenders.delete(this)
+
+        if(!this.gameState.defenders.size){
+            this.gameState.LoseGame()
+        }
     }
 }

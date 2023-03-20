@@ -4,7 +4,7 @@ export class Weapon extends Phaser.GameObjects.Sprite {
     public ShootDelay: number = 500
     public ReloadDuration: number = 1500 // seconds
     public AmmoCount: number = 30
-    public ShootDuration: number = 24
+    public ShootDuration: number = 48
     public ShootSoundName: string
     public ShootSound: Phaser.Sound.BaseSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound
     public ReloadSoundName: string

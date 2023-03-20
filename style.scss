@@ -1,0 +1,116 @@
+$maxWidth: 1280;
+@mixin adaptiv-font($pcSize, $mobSize) {
+  $addSize: $pcSize - $mobSize;
+  $addMobSize: $addSize + $addSize * 0.7;
+  @media (max-width: 767px) {
+    font-size: calc(#{$mobSize + px} + #{$addMobSize} * ((100vw - 320px) / #{$maxWidth}));
+  }
+  @media (min-width: 767px) {
+    font-size: calc(#{$mobSize + px} + #{$addSize} * (100vw / #{$maxWidth}));
+  }
+}
+:root {
+  --background: #242331aa;
+  --background-black: #242331ff;
+  --caf-noir: #533e2dff;
+  --golden-brown: #a27035ff;
+  --lion: #b88b4aff;
+  --citron: #ddca7dff;
+}
+html, body, #game {
+  width: 100%;
+  height: 100%;
+  background-color: aliceblue;
+  color: white;
+  overflow: hidden;
+}
+#game {
+  position: relative;
+  font-family: monogram, monospace;
+}
+.hidden {
+  display: none!important;
+}
+.ui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ui #money_text_container {
+  margin: 10px;
+  @include adaptiv-font(32, 12);
+
+}
+
+.ui #not_enough_money_text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-top: -20px;
+  transform: translate(-50%, -50%);
+  @include adaptiv-font(64, 12);
+
+  &.start-animation {
+    animation: 2s linear 0s normal none not-enough-money;
+    -webkit-animation: 2s linear 0s normal none not-enough-money;
+    -moz-animation: 2s linear 0s normal none not-enough-money;
+  }
+}
+.menu {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  height: 60%;
+  background-color: var(--background);
+  border-radius: 5%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.menu > * {
+  align-self: center;
+}
+
+.menu .btn {
+  width: 50%;
+  height: 15%;
+  border: none;
+  border-radius: 0;
+  background: none;
+  outline: none;
+  color: white;
+  @include adaptiv-font(48, 12);
+  font-family: monogram, monospace;
+  transition: 0.4s;
+  appearance: none;
+
+}
+
+.menu .btn:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+.menu .title {
+  @include adaptiv-font(64, 16);
+  margin: 10% auto 10%;
+}
+
+@keyframes not-enough-money {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0;
+  }
+}
