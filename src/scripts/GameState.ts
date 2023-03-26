@@ -1,6 +1,7 @@
-import {Defender} from "./Defender";
-import {Enemy} from "./Enemy";
-import BackgroundScene from "./scenes/BackgroundScene";
+import {Defender} from "./Logic/Entities/Defender";
+import {Enemy} from "./Logic/Entities/Enemy";
+import BackgroundScene from "../scenes/BackgroundScene";
+import {Page} from "../page";
 
 class Obstacle {
 }
@@ -14,6 +15,7 @@ export class GameState {
     public isActive: boolean = false
     public isLost: boolean = false
     public game: Phaser.Game | undefined
+    public ZombieNewbieTexture: string = 'zombie-newbie-1'
     public get Money() {
         return this._money
     }
@@ -40,18 +42,15 @@ export class GameState {
     }
 
     LoseGame() {
-        const ui = document.querySelector('.ui')!
+        Page.NavigateTo('restartMenu')
 
-        ui.classList.add('hidden')
-
-        document.querySelector('.lose.menu')!
-            .classList.remove('hidden')
         this.isLost = true
         this.enemies.clear()
         this.enemiesPool.clear()
         this.defenders.clear()
         this.game?.scene.remove('main')
         this.game?.scene.add('background', BackgroundScene, true)
+        this.Money = 0
     }
 
     NotEnoughMoney() {
@@ -62,6 +61,14 @@ export class GameState {
         notEnoughText.onanimationend = () => {
             notEnoughText.classList.remove('start-animation')
             notEnoughText.classList.add('hidden')
+        }
+    }
+
+    ChangeTexture(texture: string){
+
+        this.ZombieNewbieTexture = texture
+        for (const enemy of this.enemies) {
+            enemy.Sprite.setTexture(texture)
         }
     }
 }

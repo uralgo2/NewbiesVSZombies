@@ -1,18 +1,14 @@
-import {Weapon} from "./Weapon";
+import {Weapon} from "../Weapons/Weapon";
 import Phaser from "phaser";
-import Main, {between} from "./scenes/Game";
-import {GameState} from "./GameState";
+import Main from "../../../scenes/Game";
+import {GameState} from "../../GameState";
 import {Enemy} from "./Enemy";
+import Utils from "../../Utils";
+import Entity from "./Entity";
 
-export class Defender extends Phaser.GameObjects.Container {
-    sprite: Phaser.GameObjects.Sprite
+export class Defender extends Entity {
     protected weapon: Weapon
-    protected healthPoints: number = 20
-    protected maxHealthPoints: number = 20
-    bar: Phaser.GameObjects.Graphics
     public TimeToDetectEnemy: number = 1000
-    private gameState = GameState.instance
-    public isDead: boolean = false
     constructor(
         scene: Phaser.Scene,
         x: number,
@@ -20,45 +16,37 @@ export class Defender extends Phaser.GameObjects.Container {
         texture: string,
         weapon: Weapon,
     ) {
-        super(scene, x, y)
+        super(scene, x, y, texture, 0x00FF00)
 
-        this.sprite = scene.physics.add.sprite(0, 0, texture)
-            .setOrigin(0)
-            .setScale(2)
         this.weapon = weapon
         weapon.x = 8
         weapon.y = 12
         weapon.play('Gun_0_Idle')
+
         this.x = x
         this.y = y
-        this.bar = scene.add.graphics()
 
-
-        this.sprite.addToUpdateList()
         this.weapon.addToUpdateList()
-        this.bar.addToUpdateList()
-        this.addToUpdateList()
 
-        scene.add.existing(this)
-        this.add([this.sprite, weapon, this.bar])
+        this.add(this.weapon)
 
-        this.redrawHealthBar()
-        this.sprite.anims.play('Idle')
+        this.Sprite.anims.play('Idle')
 
         this.gameState.defenders.add(this)
-        this.depth = this.y
-        this.sprite.setInteractive({draggable: true})
-        scene.input.setDraggable(this.sprite)
-        this.sprite.on('drag',  (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number)=> {
 
-            this.x = between(pointer.x - 16 * 5, 0, 300);
-            this.depth = this.y = between(pointer.y - 16 * 5, 98, 550);
+        this.Sprite.setInteractive({draggable: true})
+
+        scene.input.setDraggable(this.Sprite)
+        this.Sprite.on('drag',  (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number)=> {
+
+            this.x = Utils.Between(pointer.x - 16 * 5, 0, 300);
+            this.depth = this.y = Utils.Between(pointer.y - 16 * 5, 98, 550);
 
         });
     }
 
     public Idle(){
-        this.sprite.anims.play({
+        this.Sprite.anims.play({
             key: 'Idle',
             repeat: -1,
             frameRate: 4,
@@ -68,16 +56,16 @@ export class Defender extends Phaser.GameObjects.Container {
     }
 
     public Shoot(){
-        if(this.isDead) return
+        if(this.IsDead) return
         if(this.weapon.AmmoCount === 0)
             return this.Reload()
 
         let has = false
 
-        const halfHeight = this.sprite.displayHeight*this.scale / 2
+        const halfHeight = this.Sprite.displayHeight*this.scale / 2
         for(let enemy of this.gameState.enemies){
             if(enemy.y >= this.y - halfHeight  && enemy.y <= this.y + halfHeight
-            && enemy.x < this.scene.game.scale.width - enemy.sprite.displayHeight*enemy.scale /2) {
+            && enemy.x < this.scene.game.scale.width - enemy.Sprite.displayHeight*enemy.scale /2) {
                 has = true
                 break
             }
@@ -92,20 +80,20 @@ export class Defender extends Phaser.GameObjects.Container {
 
         const enemisToShoot = []
         for (const enemy of this.gameState.enemies) {
-            const rect = new Phaser.Geom.Rectangle(enemy.x, enemy.y, 2, enemy.sprite.displayHeight*enemy.scale)
+            const rect = new Phaser.Geom.Rectangle(enemy.x, enemy.y, 2, enemy.Sprite.displayHeight*enemy.scale)
             const isIntersects = intersect(line, rect)
             if(isIntersects)
             {
-                enemisToShoot.push(enemy.sprite)
+                enemisToShoot.push(enemy)
             }
         }
 
-        const closest = this.scene.physics.closest(this.sprite, enemisToShoot) as Phaser.GameObjects.Sprite
+        const closest = Utils.Closest(this as Entity, enemisToShoot.values())
 
-        if(closest?.parentContainer)
-            (closest?.parentContainer as Enemy).Damage(this.weapon.Damage)
+        if(closest)
+            (closest as Enemy).Damage(this.weapon.Damage)
 
-        this.sprite.anims.play({
+        this.Sprite.anims.play({
             key: 'Fire',
         })
 
@@ -124,33 +112,11 @@ export class Defender extends Phaser.GameObjects.Container {
         this.weapon.ShootSound.play()
     }
 
-    public Damage(delta: number){
-        this.healthPoints -= delta
-        this.redrawHealthBar()
-        console.log(this.healthPoints)
-        if(this.healthPoints <= 0)
-        {
-            this.Die()
-        }
-    }
     public Reload(){
         this.weapon.ReloadSound.play()
         this.weapon.AmmoCount = this.weapon.AmmoCapacity
         setTimeout(() => this.Shoot(), this.weapon.ReloadDuration)
     }
-
-    private redrawHealthBar() {
-        this.bar.clear()
-
-        if(this.healthPoints != this.maxHealthPoints) {
-            this.bar.fillStyle(0xCCCCCC, 0.5)
-            this.bar.fillRect(0, -8, 32, 4)
-
-            this.bar.fillStyle(0x00FF00, 0.7)
-            this.bar.fillRect(0, -8, (this.healthPoints / this.maxHealthPoints) * 32, 4)
-        }
-    }
-
 
     preUpdate(time: number, delta: number) {
     }
@@ -164,9 +130,9 @@ export class Defender extends Phaser.GameObjects.Container {
         this.Shoot()
     }
 
-    private Die() {
-        this.isDead = true
-        this.destroy(true)
+    protected Die() {
+        super.Die()
+
         this.gameState.defenders.delete(this)
 
         if(!this.gameState.defenders.size){

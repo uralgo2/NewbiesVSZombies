@@ -1,14 +1,13 @@
 import Phaser, {Game} from 'phaser';
-import {Defender} from "../Defender";
-import {Carbine} from "../weapons/Carbine";
-import {Enemy} from "../Enemy";
-import {GameState} from "../GameState";
+import {Defender} from "../scripts/Logic/Entities/Defender";
+import {Carbine} from "../scripts/Logic/Weapons/Carbine";
+import {Enemy} from "../scripts/Logic/Entities/Enemy";
+import {GameState} from "../scripts/GameState";
+import Utils from "../scripts/Utils";
 
 const MAX_NEWBIE_ZOMBIE_HP = 32
 
-export function between (num: number, x: number, y: number) {
-  return Math.min(y, Math.max(x, num))
-}
+
 
 export default class Main extends Phaser.Scene {
   private isFire = false
@@ -21,7 +20,9 @@ export default class Main extends Phaser.Scene {
 
   preload() {
     this.load.aseprite('newbie', 'assets/newbie.png', 'assets/newbie.json')
-    this.load.aseprite('zombie-newbie', 'assets/zombie-newbie3.png', 'assets/zombie-newbie3.json')
+    this.load.aseprite('zombie-newbie-3', 'assets/zombie-newbie3.png', 'assets/zombie-newbie3.json')
+    this.load.aseprite('zombie-newbie-2', 'assets/zombie-newbie2.png', 'assets/zombie-newbie2.json')
+    this.load.aseprite('zombie-newbie-1', 'assets/zombie-newbie.png', 'assets/zombie-newbie.json')
     this.load.aseprite('gun_0', 'assets/gun_0.png', 'assets/gun_0.json')
 
     this.load.image('background', 'assets/background.png');
@@ -32,17 +33,15 @@ export default class Main extends Phaser.Scene {
   }
 
   create() {
-    window.addEventListener('blur', () => {
-      console.log('blur')
-      this.game.scene.pause('main')
-    })
+    const onBlur = this.onBlur.bind(this)
+    const onFocus = this.onFocus.bind(this)
 
-    window.addEventListener('focus', () => {
-      console.log('focus')
-      this.game.scene.run('main')
-    })
+    window.addEventListener('blur', onBlur)
+    window.addEventListener('focus', onFocus)
 
-    this.anims.createFromAseprite('zombie-newbie')
+    this.anims.createFromAseprite('zombie-newbie-3')
+    this.anims.createFromAseprite('zombie-newbie-2')
+    this.anims.createFromAseprite('zombie-newbie-1')
     this.anims.createFromAseprite('newbie')
     this.anims.createFromAseprite('gun_0')
 
@@ -65,8 +64,8 @@ export default class Main extends Phaser.Scene {
 
       const defender = new Defender(
           this,
-          between(this.input.activePointer.x-16*5, 0, 300),
-          between(this.input.activePointer.y-16*5, 98, 550),
+          Utils.Between(this.input.activePointer.x-16*5, 0, 300),
+          Utils.Between(this.input.activePointer.y-16*5, 98, 550),
           'newbie',
           new Carbine(this, 0, 0)
       )
@@ -82,13 +81,15 @@ export default class Main extends Phaser.Scene {
     background.setOrigin(0)
     background.setScale(10)
 
-  let difficult = 5000;
+    console.log(GameState.instance)
+  let difficult = 5000
     const spawn = () => {
       if(document.hasFocus()) {
         difficult *= 0.95
-        difficult = between(difficult, 800, 5000)
+        difficult = Utils.Between(difficult, 800, 5000)
 
-        const enemy = new Enemy(this, 1280, between(Math.random() * 720 - 16 * 5, 98, 550), 'zombie-newbie')
+        const enemy = new Enemy(this, 1280, Utils.Between(Math.random() * 720 - 16 * 5, 98, 550), GameState.instance.ZombieNewbieTexture)
+
         enemy.setScale(5)
       }
       setTimeout(spawn, difficult)
@@ -100,16 +101,31 @@ export default class Main extends Phaser.Scene {
       this.resize();
 
     });
+
+    this.events.once('destroy', () => {
+      window.removeEventListener('focus', onFocus)
+      window.removeEventListener('blur', onBlur)
+
+    })
+  }
+  private onFocus() {
+    console.log('focus')
+    this.game.scene.run('main')
+  }
+
+  private onBlur() {
+      console.log('blur')
+      this.game.scene.pause('main')
   }
 
   private resize() {
     const canvas = document.querySelector('#game canvas') as HTMLCanvasElement
-    const offsetLeft = canvas.style.marginLeft
-    const offsetTop = canvas.style.marginTop
+    const { marginLeft, marginTop, width, height } = canvas.style
+    const ui = document.querySelector('#inGameUI') as HTMLElement
 
-    const ui = document.querySelector('.ui') as HTMLElement
-
-    ui.style.paddingLeft = offsetLeft
-    ui.style.paddingTop = offsetTop
+    ui.style.left = marginLeft
+    ui.style.top = marginTop
+    ui.style.width = width
+    ui.style.height = height
   }
 }

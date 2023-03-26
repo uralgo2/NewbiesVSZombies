@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import config from './config';
 import GameScene from './scenes/Game';
-import {GameState} from "./GameState";
+import {GameState} from "./scripts/GameState";
 import BackgroundScene from "./scenes/BackgroundScene";
 export function start(ysdk: any) {
     console.log(ysdk)
@@ -28,7 +28,7 @@ export function start(ysdk: any) {
     })
     const game = GameState.instance.game = new Phaser.Game(
         Object.assign(config, {
-            scene: [BackgroundScene, GameScene]
+            scene: [BackgroundScene]
         })
     );
 

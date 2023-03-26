@@ -21,21 +21,44 @@
   </head>
   <body>
     <div id="game">
-      <div class="ui hidden">
-        <p id="money_text_container">Монет: <span id="money_text">0</span></p>
-        <p id="not_enough_money_text" class="hidden">Не достаточно монет!</p>
-      </div>
-      <div class="menu">
-        <p class="title">Нубики Против Зомби</p>
+      <div id="ui" class="ui">
+        <div id="mainMenu" class="menu">
+          <p class="title">Нубики Против Зомби</p>
 
-        <button class="start btn">Играть</button>
-        <button class="settings btn">Настройки</button>
-      </div>
-      <div class="lose menu hidden">
-        <p class="title">Нубики Против Зомби</p>
+          <button onclick="startGame()" class="start btn">Играть</button>
+          <button onclick="navigateTo('settingsMenu')" class="settings btn">Настройки</button>
+        </div>
 
-        <button class="re start btn">Начать заново</button>
-        <button class="settings btn">Настройки</button>
+        <div id="settingsMenu" class="menu hidden">
+          <p class="title">Настройки</p>
+          <label class="text" for="zombie-texture-select">Текстура зомби-нубика: </label>
+          <select onchange="changeTexture(this.options[this.selectedIndex].value)" id="zombie-texture-select">
+            <option value="zombie-newbie-1">1</option>
+            <option value="zombie-newbie-2">2</option>
+            <option value="zombie-newbie-3">3</option>
+          </select>
+          <button onclick="navigateTo(-1)" class="continue btn">Назад</button>
+
+        </div>
+
+        <div id="restartMenu" class="menu hidden">
+          <p class="title">Нубики Против Зомби</p>
+
+          <button onclick="startGame()" class="re start btn">Начать заново</button>
+          <button onclick="navigateTo('settingsMenu')" class="settings btn">Настройки</button>
+        </div>
+
+        <div id="inGameUI" class="ui hidden">
+          <p id="money_text_container">Монет: <span id="money_text">0</span></p>
+          <p id="not_enough_money_text" class="hidden">Не достаточно монет!</p>
+
+          <div id="gameUnits">
+            <div class="item">
+              <img ondragend="createDefender(this)" draggable="true" src="public/assets/zombie-newbie-icon.png">
+              <p><span class="price">20</span> Монет</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </body>

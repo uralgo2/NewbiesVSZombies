@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
-import {Defender} from "../Defender";
-import {Carbine} from "../weapons/Carbine";
-import {Enemy} from "../Enemy";
-import {GameState} from "../GameState";
+import {Defender} from "../scripts/Logic/Entities/Defender";
+import {Carbine} from "../scripts/Logic/Weapons/Carbine";
+import {Enemy} from "../scripts/Logic/Entities/Enemy";
+import {GameState} from "../scripts/GameState";
 
 const MAX_NEWBIE_ZOMBIE_HP = 32
 export default class BackgroundScene extends Phaser.Scene {
@@ -13,7 +13,6 @@ export default class BackgroundScene extends Phaser.Scene {
 
   preload() {
     this.load.aseprite('newbie', 'assets/newbie.png', 'assets/newbie.json')
-    this.load.aseprite('zombie-newbie', 'assets/zombie-newbie.png', 'assets/zombie-newbie.json')
     this.load.aseprite('gun_0', 'assets/gun_0.png', 'assets/gun_0.json')
 
     this.load.image('background', 'assets/background.png');
@@ -24,7 +23,6 @@ export default class BackgroundScene extends Phaser.Scene {
   }
 
   create() {
-    this.anims.createFromAseprite('zombie-newbie')
     this.anims.createFromAseprite('newbie')
     this.anims.createFromAseprite('gun_0')
 
@@ -43,8 +41,6 @@ export default class BackgroundScene extends Phaser.Scene {
 
     background.setOrigin(0)
     background.setScale(10)
-
-    defender.bar.clear()
 
     this.events.once('destroy', function (){
       console.log(arguments)
