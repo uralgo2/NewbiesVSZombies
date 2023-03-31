@@ -9,13 +9,17 @@ export default class Entity extends Phaser.GameObjects.Container {
     protected healthBarColor: number
     protected bar: Phaser.GameObjects.Graphics
     protected gameState = GameState.instance
+    protected hitSound: Phaser.Sound.BaseSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound
+    protected deathSound: Phaser.Sound.BaseSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound | undefined
 
     constructor(
         scene: Phaser.Scene,
         x: number,
         y: number,
         texture: string,
-        healthBarColor: number = 0xFF0000
+        healthBarColor: number = 0xFF0000,
+        hitSoundName: string = 'hit',
+        deathSoundName: string | undefined = undefined
     ) {
         super(scene, x, y)
         this.healthBarColor = healthBarColor
@@ -38,6 +42,9 @@ export default class Entity extends Phaser.GameObjects.Container {
 
         this.redrawHealthBar()
         this.depth = this.y
+        this.hitSound = scene.sound.add(hitSoundName, {loop: false})
+        if(deathSoundName)
+            this.deathSound = scene.sound.add(deathSoundName, {loop: false})
     }
 
     public Damage(delta: number){
@@ -46,7 +53,7 @@ export default class Entity extends Phaser.GameObjects.Container {
         this.Sprite.setTint(0xFF6666)
 
         const prevHP = this.healthPoints
-
+        this.hitSound.play()
         setTimeout(() => {
             if(this.IsDead || this.healthPoints !== prevHP) return
 
@@ -58,6 +65,9 @@ export default class Entity extends Phaser.GameObjects.Container {
     }
 
     protected Die() {
+        if(this.deathSound)
+            this.deathSound.play()
+
         this.IsDead = true
         this.destroy(true)
     }

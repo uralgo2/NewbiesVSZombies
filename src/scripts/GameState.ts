@@ -7,6 +7,7 @@ class Obstacle {
 }
 
 export class GameState {
+    public draggingDefender: Defender | null = null
     public defenders: Set<Defender> = new Set<Defender>()
     public enemies: Set<Enemy> = new Set<Enemy>()
     public enemiesPool: Set<Enemy> = new Set<Enemy>()
@@ -16,8 +17,23 @@ export class GameState {
     public isLost: boolean = false
     public game: Phaser.Game | undefined
     public ZombieNewbieTexture: string = 'zombie-newbie-1'
+    public NewbiePriceModificator: number = 1.8
+    private _newbieCost: number = 20
+    public CoinAnimation: Phaser.Animations.Animation | null = null
+    public CoinParticlesTarget: Phaser.GameObjects.GameObject | null = null
+    public CoinParticles: Phaser.GameObjects.Particles.ParticleEmitterManager | null = null
+    private _score: number = 0
     public get Money() {
         return this._money
+    }
+    public get Score() {
+        return this._score
+    }
+    public set Score(value) {
+        this._score = value
+        //console.log('score: ', value)
+        this.game?.scene.getScene('main')
+            .events.emit(`updateScore`, this._score)
     }
     public set Money(value: number){
         this._money = value
@@ -26,6 +42,13 @@ export class GameState {
         const ui = document.querySelector('.ui')!
         const moneyText = ui.querySelector('#money_text')!
         moneyText.textContent = value.toString()
+    }
+    public get NewbieCost(){
+        return this._newbieCost
+    }
+    public set NewbieCost(value: number){
+        document.querySelector('#newbie-item .price')!.textContent
+            = String(this._newbieCost = value)
     }
     private static _instance: GameState = new GameState()
 
@@ -49,8 +72,9 @@ export class GameState {
         this.enemiesPool.clear()
         this.defenders.clear()
         this.game?.scene.remove('main')
-        this.game?.scene.add('background', BackgroundScene, true)
         this.Money = 0
+        this.NewbieCost = 20
+        this.game?.canvas.classList.add('hidden')
     }
 
     NotEnoughMoney() {

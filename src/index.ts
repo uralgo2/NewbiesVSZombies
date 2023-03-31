@@ -26,10 +26,4 @@ export function start(ysdk: any) {
             }
         }
     })
-    const game = GameState.instance.game = new Phaser.Game(
-        Object.assign(config, {
-            scene: [BackgroundScene]
-        })
-    );
-
 }

@@ -22,13 +22,9 @@ export class Weapon extends Phaser.GameObjects.Sprite {
 
         this.setOrigin(0)
         this.ShootSoundName = shootSound
-        this.ShootSound = scene.sound.add(shootSound, {
-            loop: false,
-        })
+        this.ShootSound = scene.sound.add(shootSound, {loop: false, volume: 0.5})
         this.ReloadSoundName = reloadSound
-        this.ReloadSound = scene.sound.add(reloadSound, {
-            loop: false,
-        })
+        this.ReloadSound = scene.sound.add(reloadSound, {loop: false})
     }
 
 

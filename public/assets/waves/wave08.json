@@ -1,0 +1,36 @@
+{
+  "id": "01",
+  "enemies": [
+    {
+      "id": "01",
+      "enemy": "zombie-newbie",
+      "reward": 100,
+      "spawn": {
+        "time": 0
+      }
+    },
+    {
+      "id": "02",
+      "enemy": "zombie-newbie",
+      "spawn": {
+        "afterDeath": "01"
+      }
+    },
+    {
+      "id": "03",
+      "enemy": "zombie-newbie",
+      "spawn": {
+        "afterDeath": "02"
+      }
+    },
+    {
+      "id": "04",
+      "enemy": "zombie-newbie",
+      "spawn": {
+        "afterDeath": "03",
+        "count": 4,
+        "delay": 1000
+      }
+    }
+  ]
+}

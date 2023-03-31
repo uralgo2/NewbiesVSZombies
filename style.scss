@@ -9,6 +9,16 @@ $maxWidth: 1280;
     font-size: calc(#{$mobSize + px} + #{$addSize} * (100vw / #{$maxWidth}));
   }
 }
+@mixin adaptiv($name, $pcSize, $mobSize) {
+  $addSize: $pcSize - $mobSize;
+  $addMobSize: $addSize + $addSize * 0.7;
+  @media (max-width: 767px) {
+    #{$name}: calc(#{$mobSize + px} + #{$addMobSize} * ((100vw - 320px) / #{$maxWidth}));
+  }
+  @media (min-width: 767px) {
+    #{$name}: calc(#{$mobSize + px} + #{$addSize} * (100vw / #{$maxWidth}));
+  }
+}
 :root {
   --background: #242331aa;
   --background-black: #242331ff;
@@ -20,7 +30,6 @@ $maxWidth: 1280;
 html, body, #game {
   width: 100%;
   height: 100%;
-  background-color: aliceblue;
   color: white;
   overflow: hidden;
 }
@@ -39,6 +48,47 @@ html, body, #game {
   height: 100%;
   pointer-events: none;
   overflow: hidden;
+  img {
+    -ms-interpolation-mode: nearest-neighbor; /* IE 7+ (не стандартное свойство) */
+    image-rendering: -webkit-optimize-contrast; /* Safari 6, UC Browser 9.9 */
+    image-rendering: -webkit-crisp-edges; /* Safari 7+ */
+    image-rendering: -moz-crisp-edges; /* Firefox 3.6+ */
+    image-rendering: -o-crisp-edges; /* Opera 12 */
+    image-rendering: pixelated; /* Chrome 41+ and Opera 26*/
+  }
+  #coin_icon {
+    //height: 100%;
+    @include adaptiv(width, 20, 12);
+    @include adaptiv(height, 20, 12);
+  }
+  #waveControl {
+    pointer-events: all!important;
+    position: absolute;
+    right: 5%;
+    bottom: 30%;
+    .btn {
+      @include adaptiv(width, 180, 100);
+      @include adaptiv(height, 60, 20);
+      border: none;
+      outline: none;
+      color: white;
+      overflow: hidden;
+      font-size: calc(25.5vw * 0.1);
+      &.inf-game {
+        font-size: calc(25.5vw*0.07);
+      }
+      font-family: monogram, monospace;
+      transition: 0.4s;
+      appearance: none;
+      background-color: var(--background);
+      border-radius: 5px;
+      padding: 0;
+    }
+    .btn:not([disabled]):hover {
+      cursor: pointer;
+      transform: scale(1.1);
+    }
+  }
   #gameUnits {
     pointer-events: all!important;
     position: absolute;
@@ -54,12 +104,10 @@ html, body, #game {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      img {
-        width: 100%;
-        height: auto;
-      }
+
       p {
         font-size: 24px;
+        margin: 0;
       }
     }
   }
@@ -77,6 +125,7 @@ html, body, #game {
   margin-top: -20px;
   transform: translate(-50%, -50%);
   @include adaptiv-font(64, 12);
+  
 
   &.start-animation {
     animation: 2s linear 0s normal none not-enough-money;

@@ -3,16 +3,16 @@
   <head>
     <title>Phaser 3 TypeScript Starter</title>
     <meta charset="utf-8" />
-    <style>
-      body {
-        margin: 0;
-      }
-    </style>
     <link rel="stylesheet" href="/style.css">
     <script src="https://yandex.ru/games/sdk/v2"></script>
+    <script src="/libs/seedrandom.min.js"></script>
     <script type="module" src="/src/index.ts"></script>
     <script type="module" src="/src/init.js"></script>
     <style>
+      body {
+        margin: 0;
+        background: url("assets/page-background.jpg");
+      }
       @font-face {
         font-family: 'monogram';
         src: url('assets/fonts/monogram-extended.ttf')  format('truetype');
@@ -25,7 +25,7 @@
         <div id="mainMenu" class="menu">
           <p class="title">Нубики Против Зомби</p>
 
-          <button onclick="startGame()" class="start btn">Играть</button>
+          <button onclick="startupGame()" class="start btn">Играть</button>
           <button onclick="navigateTo('settingsMenu')" class="settings btn">Настройки</button>
         </div>
 
@@ -49,12 +49,17 @@
         </div>
 
         <div id="inGameUI" class="ui hidden">
-          <p id="money_text_container">Монет: <span id="money_text">0</span></p>
+          <p id="money_text_container">Монет: <span id="money_text">0</span> <img id="coin_icon" src="/assets/coin-icon.png" alt="coin icon"></p>
           <p id="not_enough_money_text" class="hidden">Не достаточно монет!</p>
 
+          <div id="waveControl">
+            <button class="btn" onclick="startWave()" id="wave-start-button">
+              Начать волну
+            </button>
+          </div>
           <div id="gameUnits">
-            <div class="item">
-              <img ondragend="createDefender(this)" draggable="true" src="public/assets/zombie-newbie-icon.png">
+            <div id="newbie-item" class="item">
+              <img id="newbie-drag-image" draggable="true" src="/assets/newbie-icon.png" alt="newbie icon">
               <p><span class="price">20</span> Монет</p>
             </div>
           </div>
