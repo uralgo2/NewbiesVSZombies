@@ -3,15 +3,16 @@ import Phaser from "phaser";
 import Utils from "../../Utils";
 import {Enemy} from "../Entities/Enemy";
 import {GameState} from "../../GameState";
+import Main from "../../../scenes/Game";
 
 export class Waves {
     protected waves: Map<string, Wave>
     protected wavesStack: Wave[] = []
-    protected scene: Phaser.Scene
+    protected scene: Main
     public currentWave?: Wave
     public isInifnityGame = false
 
-    constructor(scene: Phaser.Scene) {
+    constructor(scene: Main) {
         this.waves = new Map<string, Wave>()
         this.scene = scene
     }
@@ -48,7 +49,8 @@ export class Waves {
                 getScore: enemyData.getScore ?? 1,
                 reward: enemyData.reward,
                 delay: enemyData.spawn.delay,
-                btwDelay: enemyData.spawn.btwDelay
+                btwDelay: enemyData.spawn.btwDelay,
+                scale: enemyData.scale
             }
 
             wave.addTask(task)
@@ -60,17 +62,21 @@ export class Waves {
 
     public startInfinityGame() {
         this.isInifnityGame = true
-        let difficult = 5000
+        let difficult = 3000
         let score = 1
         let id = 0
         this.scene.events.emit('infinity-game-start', this)
         const spawn = () => {
             if (document.hasFocus()) {
                 score += 1
-                difficult *= 0.999
+                difficult *= 0.99
                 difficult = Utils.Between(difficult, 500, 5000)
 
-                const enemy = new Enemy(this.scene, 1280, Utils.Between(Math.random() * 720 - 16 * 5, 98, 550), GameState.instance.ZombieNewbieTexture, (id++).toString())
+                const x = 1280
+                const y = Utils.Between(Math.random() * 720 - 16 * 5, 98, 550)
+                const tag = (id++).toString()
+
+                const enemy =this.scene.enemies.add('zombie-newbie', x, y, tag)
 
                 const hp = Math.round(Utils.Between(10 + (score / 10), 10, 40))
 

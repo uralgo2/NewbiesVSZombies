@@ -4,6 +4,7 @@ import {GameState} from "../../GameState";
 export default class Entity extends Phaser.GameObjects.Container {
     public Sprite: Phaser.GameObjects.Sprite
     public IsDead: boolean = false
+    public isUnderAttack: boolean = false
     protected healthPoints: number = 10
     protected maxHealthPoints: number = 10
     protected healthBarColor: number
@@ -19,7 +20,8 @@ export default class Entity extends Phaser.GameObjects.Container {
         texture: string,
         healthBarColor: number = 0xFF0000,
         hitSoundName: string = 'hit',
-        deathSoundName: string | undefined = undefined
+        deathSoundName: string | undefined = undefined,
+        scale: number = 5
     ) {
         super(scene, x, y)
         this.healthBarColor = healthBarColor
@@ -41,13 +43,15 @@ export default class Entity extends Phaser.GameObjects.Container {
         this.add([this.Sprite, this.bar])
 
         this.redrawHealthBar()
-        this.depth = this.y
+        this.depth = this.y + 32*scale
         this.hitSound = scene.sound.add(hitSoundName, {loop: false})
         if(deathSoundName)
             this.deathSound = scene.sound.add(deathSoundName, {loop: false})
+
+        this.setScale(scale)
     }
 
-    public Damage(delta: number){
+    public Damage(delta: number, attacker: Entity){
         this.healthPoints -= delta
         this.redrawHealthBar()
         this.Sprite.setTint(0xFF6666)

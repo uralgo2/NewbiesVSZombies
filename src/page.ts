@@ -21,6 +21,7 @@ export class Page {
         this._m_root = document.querySelector(root)!
 
         const dragImage = this._m_root.querySelector('#newbie-drag-image')! as HTMLImageElement
+        const defenderPlacementArea = this._m_root.querySelector('#defenderPlacementArea')! as HTMLDivElement
 
         const game = GameState.instance
 
@@ -37,7 +38,7 @@ export class Page {
         }
 
         function createDefender(x: number, y: number, mainScene: Phaser.Scene) {
-            if (x > 380 || y < 98 || y > 550) return;
+            if (x > 500 || y < 160) return;
             if (game.Money < game.NewbieCost) {
                 game.NotEnoughMoney()
                 return
@@ -54,8 +55,10 @@ export class Page {
                 'newbie',
                 new Carbine(mainScene, 0, 0))
 
-            defender.setScale(5)
             defender.WaitForEnemies()
+        }
+        dragImage.ontouchstart = dragImage.ondragstart = () => {
+            defenderPlacementArea.classList.remove('hidden')
         }
 
         dragImage.ontouchend = (event) => {
@@ -63,6 +66,7 @@ export class Page {
             const x = mainScene.scale.transformX(event.changedTouches.item(0)!.pageX)
             const y = mainScene.scale.transformY(event.changedTouches.item(0)!.pageY)
 
+            defenderPlacementArea.classList.add('hidden')
             createDefender(x, y, mainScene)
 
         }
@@ -71,6 +75,7 @@ export class Page {
             const x = mainScene.scale.transformX(event.pageX)
             const y = mainScene.scale.transformY(event.pageY)
 
+            defenderPlacementArea.classList.add('hidden')
             createDefender(x, y, mainScene)
         }
     }

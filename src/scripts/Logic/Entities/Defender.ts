@@ -15,8 +15,9 @@ export class Defender extends Entity {
         y: number,
         texture: string,
         weapon: Weapon,
+        scale: number = 5
     ) {
-        super(scene, x, y, texture, 0x00FF00)
+        super(scene, x, y, texture, 0x00FF00, 'hit', undefined, scale)
 
         this.weapon = weapon
         weapon.x = 8
@@ -39,9 +40,9 @@ export class Defender extends Entity {
         scene.input.setDraggable(this.Sprite)
         this.Sprite.on('drag',  (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number)=> {
 
-            this.x = Utils.Between(pointer.x - 16 * 5, 0, 300);
-            this.depth = this.y = Utils.Between(pointer.y - 16 * 5, 98, 550);
-
+            this.x = Utils.Between(pointer.x - 16 * 5, -16*2.5, 480-16*5);
+            this.y = Utils.Between(pointer.y - 16 * 5, 98, 720-16*5);
+            this.depth = this.y + 32*this.scale
         });
     }
 
@@ -91,7 +92,7 @@ export class Defender extends Entity {
         const closest = Utils.Closest(this as Entity, enemisToShoot.values())
 
         if(closest)
-            (closest as Enemy).Damage(this.weapon.Damage)
+            (closest as Enemy).Damage(this.weapon.Damage, this)
 
         this.Sprite.anims.play({
             key: 'Fire',

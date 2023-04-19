@@ -1,0 +1,13 @@
+{
+  "name": "zombie-newbie-giant",
+  "reward": 200,
+  "knockBackProtection": 1,
+  "health": 100,
+  "attackPower": 10,
+  "attackDelay" : 1000,
+  "speed": 0.04,
+  "texture": "zombie-newbie1",
+  "deathSound": "zombie-death",
+  "hitSound": "zombie-hit",
+  "scale": 10
+}

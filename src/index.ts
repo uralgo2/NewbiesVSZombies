@@ -5,6 +5,7 @@ import {GameState} from "./scripts/GameState";
 import BackgroundScene from "./scenes/BackgroundScene";
 export function start(ysdk: any) {
     console.log(ysdk)
+    GameState.instance.YandexSDK = ysdk
     ysdk.features.LoadingAPI?.ready()
     ysdk.adv.getBannerAdvStatus().then(({ stickyAdvIsShowing , reason }: any) => {
         if (stickyAdvIsShowing) {

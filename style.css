@@ -33,6 +33,17 @@ html, body, #game {
   pointer-events: none;
   overflow: hidden;
 }
+#inGameUI #defenderPlacementArea {
+  position: absolute;
+  top: 27.7777777778vh;
+  topBase: 27.7777777778vh;
+  left: 0;
+  height: 72.2222222222vh;
+  heightBase: 72.2222222222vh;
+  width: 39.0625vw;
+  widthBase: 39.0625vw;
+  background-color: rgba(0, 255, 0, 0.3);
+}
 #inGameUI img {
   -ms-interpolation-mode: nearest-neighbor; /* IE 7+ (не стандартное свойство) */
   image-rendering: -webkit-optimize-contrast; /* Safari 6, UC Browser 9.9 */
@@ -124,9 +135,22 @@ html, body, #game {
   flex-direction: column;
   justify-content: center;
 }
+#inGameUI #gameUnits .item img {
+  width: auto;
+  height: auto;
+}
 #inGameUI #gameUnits .item p {
-  font-size: 24px;
   margin: 0;
+}
+@media (max-width: 767px) {
+  #inGameUI #gameUnits .item p {
+    font-size: calc(12px + 20.4 * ((100vw - 320px) / 1280));
+  }
+}
+@media (min-width: 767px) {
+  #inGameUI #gameUnits .item p {
+    font-size: calc(12px + 12 * (100vw / 1280));
+  }
 }
 
 .ui #money_text_container {

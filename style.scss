@@ -48,6 +48,19 @@ html, body, #game {
   height: 100%;
   pointer-events: none;
   overflow: hidden;
+
+  #defenderPlacementArea {
+    position: absolute;
+    top: calc((200/720) * 100vh);
+    topBase: calc((200/720) * 100vh);
+    left: 0;
+    height: calc((520/720) * 100vh);
+    heightBase: calc((520/720) * 100vh);
+    width: calc((500/1280) * 100vw);
+    widthBase: calc((500/1280) * 100vw);
+    background-color: rgba(0, 255, 0, 0.3);
+  }
+
   img {
     -ms-interpolation-mode: nearest-neighbor; /* IE 7+ (не стандартное свойство) */
     image-rendering: -webkit-optimize-contrast; /* Safari 6, UC Browser 9.9 */
@@ -104,9 +117,12 @@ html, body, #game {
       display: flex;
       flex-direction: column;
       justify-content: center;
-
+      img {
+        width: auto;
+        height: auto;
+      }
       p {
-        font-size: 24px;
+        @include adaptiv-font(24, 12);
         margin: 0;
       }
     }

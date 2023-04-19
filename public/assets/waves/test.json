@@ -1,0 +1,14 @@
+{
+  "id": "test1",
+  "enemies": [
+    {
+      "id": "01",
+      "enemy": "zombie-newbie",
+      "reward": 40,
+      "spawn": {
+        "time": 0,
+        "count": 1
+      }
+    }
+  ]
+}

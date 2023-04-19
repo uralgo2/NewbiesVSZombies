@@ -1,7 +1,7 @@
 export class Weapon extends Phaser.GameObjects.Sprite {
     public AmmoType: string = '9mm'
     public AmmoCapacity: number = 30
-    public ShootDelay: number = 500
+    public ShootDelay: number = 700
     public ReloadDuration: number = 1500 // seconds
     public AmmoCount: number = 30
     public ShootDuration: number = 48
@@ -9,7 +9,7 @@ export class Weapon extends Phaser.GameObjects.Sprite {
     public ShootSound: Phaser.Sound.BaseSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound
     public ReloadSoundName: string
     public ReloadSound: Phaser.Sound.BaseSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound
-    Damage: number = 2
+    public Damage: number = 2
     constructor(
         scene: Phaser.Scene,
         x: number,

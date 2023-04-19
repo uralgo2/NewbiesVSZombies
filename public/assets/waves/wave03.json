@@ -1,14 +1,13 @@
 {
   "id": "3",
-  "reward": 50,
   "enemies": [
     {
       "id": "01",
       "enemy": "zombie-newbie",
       "spawn": {
         "time": 0,
-        "count": 20,
-        "btwDelay": 1000
+        "count": 5,
+        "btwDelay": 1500
       }
     },
     {
@@ -16,7 +15,7 @@
       "enemy": "zombie-newbie",
       "spawn": {
         "afterDeath": "01",
-        "count": 5
+        "count": 4
       }
     },
     {
@@ -24,8 +23,9 @@
       "enemy": "zombie-newbie",
       "spawn": {
         "afterDeath": "01",
-        "count": 5,
-        "delay": 3000
+        "count": 6,
+        "delay": 3000,
+        "btwDelay": 1500
       }
     },
     {
@@ -33,8 +33,9 @@
       "enemy": "zombie-newbie",
       "spawn": {
         "afterDeath": "01",
-        "count": 5,
-        "delay": 6000
+        "count": 7,
+        "delay": 6000,
+        "btwDelay": 1000
       }
     },
     {
@@ -43,16 +44,16 @@
       "spawn": {
         "afterDeath": "04",
         "count": 10,
-        "btwDelay": 1000
+        "btwDelay": 800
       }
     },
     {
       "id": "06",
       "enemy": "zombie-newbie",
       "spawn": {
-        "score": 45,
-        "count": 32,
-        "btwDelay": 800
+        "score": 32,
+        "count": 10,
+        "btwDelay": 500
       }
     }
   ]

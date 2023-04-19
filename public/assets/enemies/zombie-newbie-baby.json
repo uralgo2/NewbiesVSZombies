@@ -1,0 +1,13 @@
+{
+  "name": "zombie-newbie-baby",
+  "reward": 10,
+  "health": 10,
+  "attackPower": 3,
+  "attackDelay" : 1000,
+  "speed": 0.14,
+  "texture": "zombie-newbie1",
+  "deathSound": "zombie-death",
+  "hitSound": "zombie-hit",
+  "scale": 3.5,
+  "knockBackProtection": 0.2
+}

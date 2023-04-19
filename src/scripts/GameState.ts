@@ -23,6 +23,7 @@ export class GameState {
     public CoinParticlesTarget: Phaser.GameObjects.GameObject | null = null
     public CoinParticles: Phaser.GameObjects.Particles.ParticleEmitterManager | null = null
     private _score: number = 0
+    public YandexSDK: any
     public get Money() {
         return this._money
     }
@@ -75,6 +76,18 @@ export class GameState {
         this.Money = 0
         this.NewbieCost = 20
         this.game?.canvas.classList.add('hidden')
+
+
+        this.YandexSDK.adv.showFullscreenAdv({
+            callbacks: {
+                onClose: function(wasShown: any) {
+                    // some action after close
+                },
+                onError: function(error: any) {
+                    // some action on error
+                }
+            }
+        })
     }
 
     NotEnoughMoney() {

@@ -2,6 +2,7 @@ import {Enemy} from "../Entities/Enemy";
 import {BossEnemy} from "../Entities/BossEnemy";
 import {GameState} from "../../GameState";
 import Utils from "../../Utils";
+import Main from "../../../scenes/Game";
 export interface EnemyData {
     id: string
     enemy: string
@@ -16,6 +17,7 @@ export interface EnemyData {
     }
     getScore?: number
     reward?: number
+    scale: number | undefined
 }
 export interface WaveData {
     id: string
@@ -23,6 +25,7 @@ export interface WaveData {
     reward?: number
 }
 export interface Task {
+    scale: number | undefined
     id: string
     enemy: string
     count: number
@@ -39,11 +42,11 @@ export class Wave {
     protected reward: number
     id: string
     protected tasks: Task[] = []
-    protected scene: Phaser.Scene
+    protected scene: Main
     protected totalScore: number = 0
     public random: () => number
     public isEnded: boolean = false
-    constructor(scene: Phaser.Scene, id: string, reward: number = 20) {
+    constructor(scene: Main, id: string, reward: number = 20) {
         this.scene = scene
         this.id = id
         this.reward = reward
@@ -75,19 +78,12 @@ export class Wave {
         for (const task of this.tasks) {
             console.log('task', task)
             const spawnOne = (id: string) => {
+                const scale = task.scale ?? this.scene.enemies.getDescription(task.enemy).scale;
                 const y = typeof task.y === 'number' ? task.y
-                    : task.y === 'random' || task.y === undefined ? Utils.Between(this.random() * 720 - 16 * 5, 98, 550)
-                        : Utils.Between(this.random() * 720 - 16 * 5, task.y.min, task.y.max)
-                const enemy = new Enemy(
-                    this.scene,
-                    1280,
-                    y,
-                    GameState.instance.ZombieNewbieTexture,
-                    id,
-                    task.getScore,
-                    task.reward)
+                    : task.y === 'random' || task.y === undefined ? Utils.Between(this.random() * 720 - 16 * scale, 98+16*(5/scale -1), 550)
+                        : Utils.Between(this.random() * 720 - 16 * scale, task.y.min, task.y.max)
 
-                enemy.setScale(5)
+                const enemy = this.scene.enemies.add(task.enemy, 1280, y, id, task.getScore, task.reward, task.scale)
             }
             const spawnEnemy = () => {
                 if(!task.btwDelay) this.tasks = this.tasks.filter((_task) => _task !== task)

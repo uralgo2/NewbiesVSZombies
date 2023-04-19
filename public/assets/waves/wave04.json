@@ -1,10 +1,9 @@
 {
-  "id": "01",
+  "id": "4",
   "enemies": [
     {
       "id": "01",
       "enemy": "zombie-newbie",
-      "reward": 100,
       "spawn": {
         "time": 0
       }
